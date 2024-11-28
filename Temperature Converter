@@ -1,0 +1,62 @@
+package application;
+	
+import java.text.DecimalFormat;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+
+
+
+public class Main extends Application {
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		GridPane root = new GridPane();
+		primaryStage.setTitle("Temperature Converter");
+		Scene scene = new Scene(root, 350, 200);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		root.setPadding(new Insets(10, 10, 10, 10));
+		root.setHgap(5);
+		root.setVgap(5);
+		Button btn = new Button();
+		btn.setText("Convert");
+		GridPane.setConstraints(btn, 0, 4);
+		TextField tf = new TextField();
+		GridPane.setConstraints(tf, 0, 3);
+		Label l = new Label(); 
+		GridPane.setConstraints(l, 0, 1);
+		ToggleGroup radbtn = new ToggleGroup();
+		RadioButton cel = new RadioButton("Celcius");
+		cel.setSelected(true);
+		GridPane.setConstraints(cel, 3, 3);
+		cel.setToggleGroup(radbtn);
+		RadioButton fah = new RadioButton("Fahrenhiet");
+		GridPane.setConstraints(fah, 3, 4);
+		fah.setToggleGroup(radbtn);
+		btn.setOnAction(event -> {
+			double tonum = Double.parseDouble(tf.getText());
+			if(cel.isSelected()) {
+				double cres = (tonum - 32) * 5 / 9;
+				l.setText("Result: " + new DecimalFormat("##.##").format(cres) + " C");
+			}
+			else {
+				double fres = tonum * 1.8 + 32;
+				l.setText("Result: " + new DecimalFormat("##.##").format(fres) + " F");
+			}
+		});
+		root.getChildren().addAll(cel, fah, tf, l, btn);
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
+	
+	public static void main(String[] args) {
+		launch(args);
+	}
+}
