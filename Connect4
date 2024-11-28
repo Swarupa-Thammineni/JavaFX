@@ -1,0 +1,252 @@
+package application;
+	
+
+
+import javafx.application.Application;
+
+import javafx.event.ActionEvent;
+
+import javafx.scene.Scene;
+
+import javafx.scene.control.Alert;
+
+import javafx.scene.control.Button;
+
+import javafx.scene.control.ButtonType;
+
+import javafx.scene.control.Alert.AlertType;
+
+import javafx.scene.layout.TilePane;
+
+import javafx.stage.Stage;
+
+
+public class Main extends Application{
+
+        Button btns[][] = new Button[5][7];
+
+        int turn = 0;
+
+        public static void main(String[] args) {
+
+                launch(args);
+
+        }
+
+        @Override
+
+        public void start(Stage st) throws Exception {
+
+                TilePane root = new TilePane();
+
+                root.setStyle("-fx-background-color: cyan;"
+
+                                + "-fx-padding: 10;"
+
+                                + "-fx-hgap: 5;"
+
+                                + "-fx-vgap: 5;"
+
+                                + "-fx-pref-columns: 7;");
+
+                for (int r = 0; r < btns.length; r++) {
+
+                        for (int c = 0; c < btns[r].length; c++) {
+
+                                Button b = btns[r][c] = new Button();
+
+                                b.setUserData(new Data(r, c, ' '));
+
+                                b.setOnAction(e->action(e));
+
+                                b.setPrefSize(50, 50);
+
+                                b.setStyle("-fx-background-radius: 50%;");
+
+                                root.getChildren().add(b);
+
+                        }
+
+                }
+
+                
+
+                Scene sc = new Scene(root);
+
+                st.setScene(sc);
+
+                st.setTitle("Connect 4");
+
+                st.show();
+
+        }
+
+        public void action(ActionEvent e) {                
+
+                Button clicked = (Button) e.getSource();
+
+                Data d = (Data) clicked.getUserData();
+
+                String lineData = "";
+
+                int currentCol = d.col;
+
+                int currentRow = 4;
+
+                for (currentRow = 4; currentRow > -1; currentRow--) {
+
+                        Data rowData = (Data) btns[currentRow][currentCol].getUserData();
+
+                        if (rowData.color == ' ') {// found lowest free button
+
+                                //btns[currentRow][currentCol].setDisable(true);
+
+                                if (turn%2 == 1) {
+
+                                        rowData.color = 'b';
+
+                                        btns[currentRow][currentCol].setStyle(
+
+                                                        "-fx-background-radius: 50%;"
+
+                                                        + "-fx-base: blue;");
+
+                                }else {
+
+                                        rowData.color = 'r';
+
+                                        btns[currentRow][currentCol].setStyle(
+
+                                                        "-fx-background-radius: 50%;"
+
+                                                        + "-fx-base: red;");
+
+                                }
+
+                                break;
+
+                        }
+
+                }
+
+                
+
+                if (currentRow > -1) {// col is not full
+
+                        turn++;
+
+                        for (int i = 0; i < 7; i++) {// horizontal line
+
+                                Data btnData = (Data) btns[currentRow][i].getUserData();
+
+                                lineData+=btnData.color;
+
+                        }
+
+                        lineData += "#";
+
+                        for (int i = 0; i < 5; i++) {// for vertical line
+
+                                Data btnData = (Data) btns[i][currentCol].getUserData();
+
+                                lineData+=btnData.color;
+
+                        }
+
+                        lineData += "#";
+
+                        int sr = Math.max(0, currentRow-currentCol);
+
+                        int sc = Math.max(0, currentCol-currentRow);
+
+                        while (sr < 5 && sc < 7) {
+
+                                Data btnData = (Data) btns[sr][sc].getUserData();
+
+                                lineData+=btnData.color;
+
+                                sr++; sc++;
+
+                        }
+
+                        lineData += "#";
+
+                        sr = currentRow-Math.min(currentRow, 6-currentCol);
+
+                        sc = Math.min(6, currentRow+currentCol);
+
+                        System.out.println(sr + "," + sc);
+
+                        while (sr < 5 && sc>-1) {                                
+
+                                Data btnData = (Data) btns[sr][sc].getUserData();
+
+                                System.out.println(sr +"," + sc );
+
+                                lineData+=btnData.color;
+
+                                sr++; sc--;
+
+                        }
+
+                        System.out.println(lineData);
+
+                }
+
+                if (lineData.contains("rrrr")) {
+
+                        new Alert(AlertType.INFORMATION, "Red Player Win!", ButtonType.OK).showAndWait();
+
+                        disabledButtons();
+
+                }else if (lineData.contains("bbbb")) {
+
+                        new Alert(AlertType.INFORMATION, "Blue Player Win!", ButtonType.OK).showAndWait();
+
+                        disabledButtons();
+
+                }else if (turn == 34) {// no winner and all buttons filled
+
+                        new Alert(AlertType.INFORMATION, "It is draw!", ButtonType.OK).showAndWait();
+
+                        disabledButtons();
+
+                }                
+
+        }
+
+        private void disabledButtons() {
+
+                for (int r = 0; r < btns.length; r++) {
+
+                        for (int c = 0; c < btns[r].length; c++) {
+
+                                btns[r][c].setDisable(true);
+
+                        }
+
+                }
+
+        }
+
+        public static class Data{
+
+                private int row, col;
+
+                private char color;
+
+                public Data(int row, int col, char color) {
+
+                        this.row = row;
+
+                        this.col = col;
+
+                        this.color = color;
+
+                }
+
+                
+
+        }
+
+}
